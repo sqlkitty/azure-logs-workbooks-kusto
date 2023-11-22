@@ -1,0 +1,229 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "DB Audit Dashboard (graph shows last 24 hours)",
+        "style": "success"
+      },
+      "name": "text - 3"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "Use parameters under graph to get query details for each database ",
+        "style": "info"
+      },
+      "name": "text - 6"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureDiagnostics\r\n| where Category == 'SQLSecurityAuditEvents'\r\n    and TimeGenerated > ago(1d) \r\n| summarize count () by database_name_s\r\n| render barchart",
+        "size": 0,
+        "title": "Query Count by Database",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "tileSettings": {
+          "titleContent": {
+            "columnMatch": "database_name_s",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "count_",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          },
+          "showBorder": false,
+          "sortCriteriaField": "count_",
+          "sortOrderField": 2
+        },
+        "graphSettings": {
+          "type": 0,
+          "topContent": {
+            "columnMatch": "database_name_s",
+            "formatter": 1
+          },
+          "centerContent": {
+            "columnMatch": "count_",
+            "formatter": 1,
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          },
+          "nodeIdField": "count_",
+          "sourceIdField": "count_",
+          "targetIdField": "database_name_s",
+          "graphOrientation": 3,
+          "showOrientationToggles": false,
+          "nodeSize": null,
+          "staticNodeSize": 100,
+          "colorSettings": null,
+          "hivesMargin": 5,
+          "edgeColorSettings": null
+        }
+      },
+      "name": "query - 1"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "Query One DB at a Time with a Time Range",
+        "style": "info"
+      },
+      "name": "text - 5"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "9ccaf798-6521-4435-b0ce-eac0982f729b",
+            "version": "KqlParameterItem/1.0",
+            "name": "DatabaseName",
+            "label": "Database Name",
+            "type": 2,
+            "isRequired": true,
+            "query": "AzureDiagnostics\n| where Category == 'SQLSecurityAuditEvents'\n| distinct database_name_s",
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces",
+            "value": "db-rg-sterling-rabbit"
+          },
+          {
+            "id": "a1544167-3ee1-4bbd-85e9-cf9b8712c727",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeGenerated",
+            "label": "Time Generated",
+            "type": 4,
+            "isRequired": true,
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 300000
+                },
+                {
+                  "durationMs": 900000
+                },
+                {
+                  "durationMs": 1800000
+                },
+                {
+                  "durationMs": 3600000
+                },
+                {
+                  "durationMs": 14400000
+                },
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                }
+              ],
+              "allowCustom": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "value": {
+              "durationMs": 86400000
+            }
+          }
+        ],
+        "style": "above",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 3"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureDiagnostics\n| where Category == 'SQLSecurityAuditEvents'\n   and database_name_s == '{DatabaseName}'\n| project\n    event_time_t,\n    database_name_s,\n    action_name_s,\n    statement_s,\n    server_principal_name_s,\n    succeeded_s,\n    client_ip_s,\n    application_name_s,\n    additional_information_s,\n    data_sensitivity_information_s\n| order by event_time_t desc\n| limit 10000\n",
+        "size": 0,
+        "timeContextFromParameter": "TimeGenerated",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "sortBy": [
+            {
+              "itemKey": "server_principal_name_s",
+              "sortOrder": 1
+            }
+          ]
+        },
+        "sortBy": [
+          {
+            "itemKey": "server_principal_name_s",
+            "sortOrder": 1
+          }
+        ]
+      },
+      "name": "query - 5"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureDiagnostics\r\n| where Category == 'SQLSecurityAuditEvents'\r\n    and TimeGenerated > ago(1d) \r\n| summarize count () by action_name_s\r\n| render barchart\r\n",
+        "size": 0,
+        "title": "Audit Action Count",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "query - 0"
+    }
+  ],
+  "fallbackResourceIds": [
+    "/subscriptions/244eb28e-a9b8-42d4-9260-c0c553ae92e1/resourceGroups/rg-sterling-rabbit/providers/Microsoft.OperationalInsights/workspaces/law-rg-sterling-rabbit"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
